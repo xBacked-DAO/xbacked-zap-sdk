@@ -89,6 +89,7 @@ class VaultClient {
     const globalState = await readGlobalState(this.indexer, appIndex);
     const appArgs = [
       textEncoder.encode(Buffer.from("create_vault").toString()),
+      algosdk.encodeUint64(collateral),
     ];
 
     const assetIndex = collateralAsset;
