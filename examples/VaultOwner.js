@@ -31,7 +31,8 @@ const indexerPort = 443;
        2.) Create vault 
        3.) to withdraw collateral  
        4.) to deposit collateral
-       5.) to return vault debt \n`));
+       5.) to return vault debt 
+      \n`));
     
         try {
             
@@ -56,7 +57,7 @@ const indexerPort = 443;
             case 5: const isDebtReturned = await client.return({debt: 100,
                   vault});
               console.log(`isDebtReturned: ${isDebtReturned}`);
-            break;
+              break;
           }
         } catch (error) {
           console.error(error);

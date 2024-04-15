@@ -847,6 +847,35 @@ class VaultClient {
     return debt;
   }
 
+
+  async updatePrice(args: {
+    vault: Vault, 
+    price: number
+  }){
+    const{price, vault} = args;
+     const params: SuggestedParams = await this.client
+       .getTransactionParams()
+       .do();
+     const whitelistedAssetPrice = price;
+      const appArgs = [
+        textEncoder.encode(Buffer.from("update_price").toString()),
+        algosdk.encodeUint64(whitelistedAssetPrice),
+      ];
+      const from = this.address;
+      const updateAppTxn = algosdk.makeApplicationNoOpTxn(
+        from,
+        params,
+        vault.appIndex,
+        appArgs
+      );
+      const atc = new algosdk.AtomicTransactionComposer();
+      atc.addTransaction({
+        txn: updateAppTxn,
+        signer: algosdk.makeEmptyTransactionSigner(),
+      });
+      return await this.signAndSend(atc);
+  }
+
   async getAllVaults(params: {
     vault: Vault;
   }): Promise<(UserVaultType)[]> {

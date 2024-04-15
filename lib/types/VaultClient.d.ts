@@ -112,6 +112,10 @@ declare class VaultClient {
         collateral: number;
         lpAppState: LPAPP;
     }): number;
+    updatePrice(args: {
+        vault: Vault;
+        price: number;
+    }): Promise<string>;
     getAllVaults(params: {
         vault: Vault;
     }): Promise<(UserVaultType)[]>;
