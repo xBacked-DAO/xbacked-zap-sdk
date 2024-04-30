@@ -112,9 +112,15 @@ declare class VaultClient {
         collateral: number;
         lpAppState: LPAPP;
     }): number;
+    updateLocalState(address: string, vault: Vault): Promise<string>;
+    claimRewardsFromFarm: (address: string, vault: Vault, rewardAsset: number) => Promise<string>;
+    updatePrice(args: {
+        vault: Vault;
+        price: number;
+    }): Promise<string>;
     getAllVaults(params: {
         vault: Vault;
-    }): Promise<(UserVaultType)[]>;
+    }): Promise<UserVaultType[]>;
     getUserAddress(): void;
 }
 export default VaultClient;

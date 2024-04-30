@@ -7,7 +7,7 @@ dotenv.config()
 const token =
 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 // const server = "http://localhost";
-const server = "https://testnet-api.algonode.cloud";
+const server = "https://mainnet-api.algonode.cloud";
 const port = 443;
 // const port = "4001";
 
@@ -15,14 +15,14 @@ const port = 443;
 const indexerToken =
 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 // const indexerServer = "http://localhost";
-const indexerServer = "https://testnet-idx.algonode.cloud";
+const indexerServer = "https://mainnet-idx.algonode.cloud";
 const indexerPort = 443;
 // const indexerPort = "8980";
 
 (async()=>{
     const client =  new VaultClient({mnemonic: process.env.MNEMONIC, algodToken: token, algodServer: server, algodPort: port, indexerToken, indexerServer, indexerPort});
     console.log(client);
-    const vault = new Vault("gALGO", "TestNet");
+    const vault = new Vault("meldGold", "MainNet");
     console.log(client.address);
     while (true) {
         const todo = parseInt(readlineSync.question(`
@@ -31,7 +31,11 @@ const indexerPort = 443;
        2.) Create vault 
        3.) to withdraw collateral  
        4.) to deposit collateral
-       5.) to return vault debt \n`));
+       5.) to return vault debt 
+       6.) update price
+       7.) update local state
+       8.) Claim Rewards
+      \n`));
     
         try {
             
@@ -56,6 +60,16 @@ const indexerPort = 443;
             case 5: const isDebtReturned = await client.return({debt: 100,
                   vault});
               console.log(`isDebtReturned: ${isDebtReturned}`);
+              break;
+            case 6: const updatePrice = await client.updatePrice({price: 77500000,
+              vault});
+            console.log(`updatePrice: ${updatePrice}`);
+            break; 
+            case 7: const updateLocalState = await client.updateLocalState( "ETCCQVEA6QQDXSZ6AXYPUQNK2NUAGXPQRWYMKW6E2XCSOT2S47YH3OH2DE", vault);
+            console.log(`updateLocalState: ${updateLocalState}`);
+            break;
+            case 8: const rewardsClaimed = await client.claimRewardsFromFarm( "ETCCQVEA6QQDXSZ6AXYPUQNK2NUAGXPQRWYMKW6E2XCSOT2S47YH3OH2DE", vault, 0);
+            console.log(`rewardsClaimed: ${rewardsClaimed}`);
             break;
           }
         } catch (error) {
@@ -63,3 +77,6 @@ const indexerPort = 443;
         }
       }
 })()
+
+
+

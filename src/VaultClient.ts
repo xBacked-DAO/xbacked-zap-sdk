@@ -114,7 +114,7 @@ class VaultClient {
     const boxFeePaymentTxn = algosdk.makePaymentTxnWithSuggestedParams(
       from,
       appAddress,
-      balanceForBoxCreated + 1000000,
+      balanceForBoxCreated + 1100000,
       undefined,
       undefined,
       params
@@ -278,7 +278,7 @@ class VaultClient {
         liquidityToken,
       ],
       signer: algosdk.makeEmptyTransactionSigner(),
-      suggestedParams: { ...params, fee: 1000 },
+      suggestedParams: { ...params, fee: 8 },
       appAccounts: [userState.escrowAddress, userState.interfaceAddress],
       appForeignApps: [userState.escrowId],
       appForeignAssets: [liquidityToken],
@@ -847,20 +847,103 @@ class VaultClient {
     return debt;
   }
 
-  async getAllVaults(params: {
-    vault: Vault;
-  }): Promise<(UserVaultType)[]> {
-    const { appIndex} = params.vault;
-    const allGlobalData = await this.getAllGlobalData({vault: params.vault});
-    const allVaults =  await fetchAllVaults(appIndex, "begin", this.indexer, this.client);
+  async updateLocalState(address: string, vault: Vault) {
+    const userState = await this.getUserState({ address, vault });
+    const params: SuggestedParams = await this.client
+      .getTransactionParams()
+      .do();
+    const contract = new algosdk.ABIContract(contractJson);
+    const atc = new algosdk.AtomicTransactionComposer();
+    const from = this.address;
+    const { farmApp: farmAppId, liquidityToken } = vault;
+    atc.addMethodCall({
+      appID: farmAppId,
+      method: contract.getMethodByName("update_state"),
+      sender: from,
+      methodArgs: [
+        userState.escrowId,
+        userState.escrowAddress,
+        userState.interfaceAddress,
+        liquidityToken,
+      ],
+      signer: algosdk.makeEmptyTransactionSigner(),
+      suggestedParams: { ...params, fee: 1000, flatFee: true },
+      appAccounts: [userState.escrowAddress, userState.interfaceAddress],
+      appForeignApps: [userState.escrowId],
+      appForeignAssets: [liquidityToken],
+    });
+    return await this.signAndSend(atc);
+  }
 
-    const adddedLpVaultState = allVaults.map((userVault)=>{
-      const otherInfo = this.localVaultDataCalc({lpAppState: allGlobalData.lpAppState, zapGlobalState: allGlobalData.zapGlobalState, userState: userVault, vault: params.vault})
-          return{
+  claimRewardsFromFarm = async (address: string, vault: Vault, rewardAsset: number) => {
+    const params: SuggestedParams = await this.client
+      .getTransactionParams()
+      .do();
+    const contract = new algosdk.ABIContract(contractJson);
+    const atc = new algosdk.AtomicTransactionComposer();
+    const { farmApp: farmAppId } = vault;
+    const userState = await this.getUserState({ address, vault });
+    const from = this.address;
+    atc.addMethodCall({
+      appID: farmAppId,
+      method: contract.getMethodByName("claim_rewards"),
+      sender: from,
+      methodArgs: [userState.interfaceAddress, [0]],
+      signer: algosdk.makeEmptyTransactionSigner(),
+      suggestedParams: { ...params, fee: 2000, flatFee: true },
+      appAccounts: [userState.interfaceAddress],
+      appForeignAssets: [rewardAsset],
+    });
+
+   return await this.signAndSend(atc);
+  };
+  async updatePrice(args: { vault: Vault; price: number }) {
+    const { price, vault } = args;
+    const params: SuggestedParams = await this.client
+      .getTransactionParams()
+      .do();
+    const whitelistedAssetPrice = price;
+    const appArgs = [
+      textEncoder.encode(Buffer.from("update_price").toString()),
+      algosdk.encodeUint64(whitelistedAssetPrice),
+    ];
+    const from = this.address;
+    const updateAppTxn = algosdk.makeApplicationNoOpTxn(
+      from,
+      params,
+      vault.appIndex,
+      appArgs
+    );
+    const atc = new algosdk.AtomicTransactionComposer();
+    atc.addTransaction({
+      txn: updateAppTxn,
+      signer: algosdk.makeEmptyTransactionSigner(),
+    });
+    return await this.signAndSend(atc);
+  }
+
+  async getAllVaults(params: { vault: Vault }): Promise<UserVaultType[]> {
+    const { appIndex } = params.vault;
+    const allGlobalData = await this.getAllGlobalData({ vault: params.vault });
+    const allVaults = await fetchAllVaults(
+      appIndex,
+      "begin",
+      this.indexer,
+      this.client
+    );
+
+    const adddedLpVaultState = allVaults.map((userVault) => {
+      const otherInfo = this.localVaultDataCalc({
+        lpAppState: allGlobalData.lpAppState,
+        zapGlobalState: allGlobalData.zapGlobalState,
+        userState: userVault,
+        vault: params.vault,
+      });
+      return {
         ...userVault,
-        ...otherInfo
+        ...otherInfo,
       };
-    })
+    });
     return adddedLpVaultState;
   }
 
@@ -874,3 +957,5 @@ class VaultClient {
 }
 
 export default VaultClient;
+
+

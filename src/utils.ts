@@ -5,7 +5,7 @@
 export const VAULTS_DATA = {
   // TODO: APP iNDEX TO VAULT ID
   LocalHost: {
-    gALGO: {
+    meldGold: {
       collateralAsset: 1002,
       debtAsset: 1004,
       farmApp: 1031,
@@ -21,7 +21,7 @@ export const VAULTS_DATA = {
     },
   },
   TestNet: {
-    gALGO: {
+    meldGold: {
       collateralAsset: 228836101,
       debtAsset: 62281549,
       farmApp: 628722713,
@@ -36,7 +36,25 @@ export const VAULTS_DATA = {
       lpAssetDecimals: 6,
     },
   },
+
+  MainNet: {
+    meldGold: {
+      collateralAsset: 246516580,
+      debtAsset: 760037151,
+      farmApp: 1150765092,
+      lpApp: 1129082910,
+      appIndex: 1750934368,
+      liquidityToken: 1129082916,
+      gasStationId: 1750927794,
+      creatorAddress:
+        "2SCZW64GEZMXV7IE7LE2KHJUMJGOVQP3TZJMUJQTJUJU44S5WYLMOX7GW4",
+      discountRate: 0.05,
+      collateralAssetDecimals: 6,
+      lpAssetDecimals: 6,
+    },
+  },
 };
+
 
 export const STABLE_COIN_ASSET = {
   TestNet: 62281549,
@@ -408,6 +426,7 @@ const fetchAllVaults = async (
           escrowAddress: vault.escrow_address as string,
           interfaceId: vault.interface_app_id,
           interfaceAddress: vault.interface_address as string,
+          owner: algosdk.encodeAddress(box.name),
         };
       } catch (error) {
         return undefined;

@@ -1,6 +1,6 @@
 export declare const VAULTS_DATA: {
     LocalHost: {
-        gALGO: {
+        meldGold: {
             collateralAsset: number;
             debtAsset: number;
             farmApp: number;
@@ -15,7 +15,22 @@ export declare const VAULTS_DATA: {
         };
     };
     TestNet: {
-        gALGO: {
+        meldGold: {
+            collateralAsset: number;
+            debtAsset: number;
+            farmApp: number;
+            lpApp: number;
+            appIndex: number;
+            liquidityToken: number;
+            gasStationId: number;
+            creatorAddress: string;
+            discountRate: number;
+            collateralAssetDecimals: number;
+            lpAssetDecimals: number;
+        };
+    };
+    MainNet: {
+        meldGold: {
             collateralAsset: number;
             debtAsset: number;
             farmApp: number;
