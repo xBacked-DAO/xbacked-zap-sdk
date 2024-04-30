@@ -7,6 +7,6 @@ declare class Vault {
     liquidityToken: number;
     creatorAddress: string;
     network: string;
-    constructor(name: "gALGO", network: "LocalHost" | "TestNet");
+    constructor(name: "meldGold", network: "LocalHost" | "TestNet" | "MainNet");
 }
 export default Vault;

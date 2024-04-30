@@ -39,4 +39,5 @@ export type UserVaultType = {
   escrowAddress: string;
   interfaceId: number;
   interfaceAddress: string;
+  owner: string
 };

@@ -7,7 +7,7 @@ dotenv.config()
 const token =
 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 // const server = "http://localhost";
-const server = "https://testnet-api.algonode.cloud";
+const server = "https://mainnet-api.algonode.cloud";
 const port = 443;
 // const port = "4001";
 
@@ -15,7 +15,7 @@ const port = 443;
 const indexerToken =
 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 // const indexerServer = "http://localhost";
-const indexerServer = "https://testnet-idx.algonode.cloud";
+const indexerServer = "https://mainnet-idx.algonode.cloud";
 const indexerPort = 443;
 // const indexerPort = "8980";
 
@@ -23,7 +23,7 @@ const indexerPort = 443;
 (async()=>{
     const client =  new VaultClient({mnemonic: process.env.MNEMONIC, algodToken: token, algodServer: server, algodPort: port, indexerToken, indexerServer, indexerPort});
     console.log(client);
-    const vault = new Vault("gALGO", "TestNet");
+    const vault = new Vault("meldGold", "MainNet");
     const userAddress = client.address;
     console.log(client.address);
     while (true) {
@@ -43,7 +43,7 @@ const indexerPort = 443;
             case 1: const globalState =  await client.getAllGlobalData({vault});
               console.log(globalState);
               break;
-            case 2: const isVaultCreated = await client.getUserState({vault, address: userAddress});
+            case 2: const isVaultCreated = await client.getUserState({vault, address: "ETCCQVEA6QQDXSZ6AXYPUQNK2NUAGXPQRWYMKW6E2XCSOT2S47YH3OH2DE"});
               console.log(isVaultCreated);
               break;
             case 3: const vaultData = await client.getVaultData({vault, address: userAddress});
